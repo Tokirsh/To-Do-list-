@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoList React</title>
+
+    <!-- Scripts CDN pour React et ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+    <!-- Script CDN pour Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Link bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+</head>
+<body>
+    <div id="TodoList"></div>
+
+    <!-- Bootstrap and Babel scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script type="text/babel">
+        class TodoApp extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    todos: [],
+                    newTodo: ''
+                };
+            }
+
+            // Handle input change for new task
+            handleInputChange = (event) => {
+                this.setState({ newTodo: event.target.value });
+            };
+
+            // Function to add a new task with current date and time
+            addTodo = () => {
+                if (this.state.newTodo.trim() !== '') {
+                    const currentDate = new Date();
+                    const newTask = {
+                        id: Date.now(),  // Unique ID based on timestamp
+                        text: this.state.newTodo,
+                        dateAdded: currentDate.toLocaleString() // Date and time in locale format
+                    };
+                    this.setState({
+                        todos: [...this.state.todos, newTask],
+                        newTodo: '' // Reset input field after adding
+                    });
+                }
+            };
+
+            // Remove a task based on its ID
+            removeTodo = (id) => {
+                const updatedTodos = this.state.todos.filter(todo => todo.id !== id);
+                this.setState({ todos: updatedTodos });
+            };
+
+            // Edit a task based on its ID
+            editTodo = (id) => {
+                const updatedTodo = prompt('Edit todo:', this.state.todos.find(todo => todo.id === id).text);
+                if (updatedTodo !== null && updatedTodo.trim() !== '') {
+                    const updatedTodos = this.state.todos.map(todo =>
+                        todo.id === id ? { ...todo, text: updatedTodo } : todo
+                    );
+                    this.setState({ todos: updatedTodos });
+                }
+            };
+
+            render() {
+                return (
+                    <div className="container mt-5 p-5" style={{ backgroundColor: '#f8d7da' }}>
+                        <h1>ToDoList React</h1>
+                        <div className="input-group mb-3">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter the task"
+                                value={this.state.newTodo}
+                                onChange={this.handleInputChange}
+                                aria-label="New task"
+                            />
+                            <div className="input-group-append">
+                                <button
+                                    className="btn btn-success"
+                                    type="button"
+                                    onClick={this.addTodo}
+                                    aria-label="Add task"
+                                >
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                        <ul className="list-group">
+                            {this.state.todos.map((todo) => (
+                                <li key={todo.id} className="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{todo.text}</strong>
+                                        <br />
+                                        <small className="text-muted">Added on: {todo.dateAdded}</small>
+                                    </div>
+                                    <div>
+                                        <button
+                                            className="btn btn-danger btn-sm me-4"
+                                            onClick={() => this.removeTodo(todo.id)}
+                                            aria-label={`Remove ${todo.text}`}
+                                        >
+                                            Delete
+                                        </button>
+                                        <button
+                                            className="btn btn-warning btn-sm"
+                                            onClick={() => this.editTodo(todo.id)}
+                                            aria-label={`Edit ${todo.text}`}
+                                        >
+                                            Modify
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                );
+            }
+        }
+
+        // Render the component inside the 'TodoList' div
+        ReactDOM.render(<TodoApp />, document.getElementById('TodoList'));
+        
+    </script>
+</body>
+</html>
